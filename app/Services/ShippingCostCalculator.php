@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\RemoteArea;
 use App\Models\ShippingCostRule;
+use http\Env\Request;
 
 class ShippingCostCalculator
 {
@@ -30,15 +31,19 @@ class ShippingCostCalculator
 
         if ($usedWeight > $rule->max_weight_kg) {
             throw new \Exception("Weight exceeds max allowed weight ({$rule->max_weight_kg}kg).");
+        }else {
+            $extraWeightCharge = 0;
+            $extraWeight = 0;
         }
+
 
         $baseCost = $rule->base_cost;
-        $extraWeightCharge = 0;
 
         if ($usedWeight > $rule->extra_weight_threshold_kg) {
-            $extraWeight = ceil($usedWeight - $rule->extra_weight_threshold_kg);
+            $extraWeight = $usedWeight - $rule->extra_weight_threshold_kg;
             $extraWeightCharge = $extraWeight * $rule->extra_weight_charge_per_kg;
         }
+
 
         $subtotal1 = $baseCost + $extraWeightCharge;
         $fuel = $subtotal1 * ($rule->fuel_surcharge_percent / 100);
@@ -55,6 +60,7 @@ class ShippingCostCalculator
 
         return [
             'base_cost' => $baseCost,
+            'uesd_weight' => $extraWeight,
             'extra_weight_charge' => $extraWeightCharge,
             'subtotal_1' => $subtotal1,
             'fuel_surcharge' => $fuel,

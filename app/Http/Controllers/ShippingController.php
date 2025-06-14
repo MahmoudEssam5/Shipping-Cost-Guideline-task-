@@ -19,7 +19,6 @@ class ShippingController extends Controller
             'dimensions.height' => 'required|numeric',
         ]);
 
-        $weight = $data['weight'];
         $calculator = new ShippingCostCalculator();
         $result = $calculator->calculate($data);
 
@@ -27,7 +26,7 @@ class ShippingController extends Controller
             'success' => true,
             'breakdown' => [
                 'Base Cost' => number_format($result['base_cost'], 2) . ' AED',
-                'Extra Weight (' . number_format($weight, 1) . ' KG × 2 AED)' => number_format($result['extra_weight_charge'], 2) . ' AED',
+                'Extra Weight (' . number_format($result['uesd_weight'], 1) . ' KG × 2 AED)' => number_format($result['extra_weight_charge'], 2) . ' AED',
                 'Subtotal 1' => number_format($result['subtotal_1'], 2) . ' AED',
                 'Fuel Surcharge (2%)' => number_format($result['fuel_surcharge'], 2) . ' AED',
                 'Subtotal 2' => number_format($result['subtotal_2'], 2) . ' AED',
